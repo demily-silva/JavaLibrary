@@ -3,6 +3,9 @@ package javalibrary.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javalibrary.exception.ActiveLoanException;
+import javalibrary.exception.BookUnavailableException;
+import javalibrary.exception.LibraryException;
 import javalibrary.model.Book;
 import javalibrary.model.Loan;
 import javalibrary.model.Patron;
@@ -92,7 +95,7 @@ public class Library {
     }
 
     // Remove um livro da biblioteca.
-    public void removeBook(String isbn) {
+    public void removeBook(String isbn) throws ActiveLoanException {
         // O livro só pode ser removido se existir e não estiver emprestado.
         Book book = findBookByIsbn(isbn);
 
@@ -103,7 +106,7 @@ public class Library {
         // Um livro com empréstimo ativo não deve ser removido do sistema.
         for (Loan loan : loans) {
             if (loan.isActive() && loan.getBook().getIsbn().equalsIgnoreCase(isbn)) {
-                throw new IllegalArgumentException("Não é possível remover um livro emprestado.");
+                throw new ActiveLoanException("Não é possível remover um livro emprestado.");
             }
         }
 
@@ -184,7 +187,7 @@ public class Library {
     }
 
     // Remove um usuário da biblioteca.
-    public void removePatron(String id) {
+    public void removePatron(String id) throws ActiveLoanException {
         Patron patron = findPatronById(id);
 
         if (patron == null) {
@@ -194,7 +197,7 @@ public class Library {
         // Um usuário com empréstimo ativo não deve ser removido do sistema.
         for (Loan loan : loans) {
             if (loan.isActive() && loan.getPatron().getId().equalsIgnoreCase(id)) {
-                throw new IllegalArgumentException("Não é possível remover um usuário com empréstimo ativo.");
+                throw new ActiveLoanException("Não é possível remover um usuário com empréstimo ativo.");
             }
         }
 
@@ -206,7 +209,86 @@ public class Library {
         return new ArrayList<>(patrons);
     }
 
+    // --- Operações de empréstimos CRUD ---
+
+    // Faz o empréstimo de um livro para um usuário.
+    public Loan checkoutBook(String isbn, String patronId) throws LibraryException {
+        Book book = findBookByIsbn(isbn);
+        Patron patron = findPatronById(patronId);
+
+        if (book == null) {
+            throw new LibraryException("Livro não encontrado.");
+        }
+
+        if (patron == null) {
+            throw new LibraryException("Usuário não encontrado.");
+        }
+
+        // Se não há cópias disponíveis, o empréstimo não pode ser feito.
+        if (!book.hasAvailableCopies()) {
+            throw new BookUnavailableException("Livro sem cópias disponíveis.");
+        }
+
+        // Evita cadastrar o mesmo empréstimo ativo duas vezes para o mesmo usuário.
+        if (findActiveLoan(isbn, patronId) != null) {
+            throw new ActiveLoanException("Esse usuário já está com esse livro emprestado.");
+        }
+
+        Loan loan = new Loan(book, patron);
+        loans.add(loan);
+
+        book.setAvailableCopies(book.getAvailableCopies() - 1);
+
+        return loan;
+    }
+
+    // Registra a devolução de um livro.
+    public void returnBook(String isbn, String patronId) throws LibraryException {
+        Loan loan = findActiveLoan(isbn, patronId);
+
+        if (loan == null) {
+            throw new LibraryException("Empréstimo ativo não encontrado.");
+        }
+
+        loan.returnBook();
+
+        Book book = loan.getBook();
+        book.setAvailableCopies(book.getAvailableCopies() + 1);
+    }
+
+    // Retorna apenas os empréstimos que ainda não foram devolvidos.
+    public List<Loan> getActiveLoans() {
+        ArrayList<Loan> activeLoans = new ArrayList<>();
+
+        for (Loan loan : loans) {
+            if (loan.isActive()) {
+                activeLoans.add(loan);
+            }
+        }
+
+        return activeLoans;
+    }
+
+    // Procura um empréstimo ativo usando o ISBN do livro e o ID do usuário.
+    private Loan findActiveLoan(String isbn, String patronId) {
+        if (isbn == null || patronId == null) {
+            return null;
+        }
+
+        for (Loan loan : loans) {
+            boolean sameBook = loan.getBook().getIsbn().equalsIgnoreCase(isbn);
+            boolean samePatron = loan.getPatron().getId().equalsIgnoreCase(patronId);
+
+            if (loan.isActive() && sameBook && samePatron) {
+                return loan;
+            }
+        }
+
+        return null;
+    }
+
     public List<Loan> getLoans() {
+        // Retorna todos os empréstimos, incluindo os que já foram devolvidos.
         return new ArrayList<>(loans);
     }
 }
