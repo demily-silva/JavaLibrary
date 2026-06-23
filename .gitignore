@@ -3,14 +3,8 @@ out/
 bin/
 build/
 target/
-
 data/*.txt
 !data/.gitkeep
-
 tmp/
-
-.agents/
-.codex/
-
 .DS_Store
 Thumbs.db
