@@ -1,12 +1,15 @@
 package javalibrary.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -34,6 +37,7 @@ public class BooksPanel extends JPanel {
         this.library = library;
 
         setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         createComponents();
         refreshTable(library.getBooks());
     }
@@ -52,12 +56,18 @@ public class BooksPanel extends JPanel {
 
     // Cria os campos usados para cadastrar ou editar um livro.
     private JPanel createFormPanel() {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(4, 2, 8, 8));
+        panel.setBorder(BorderFactory.createTitledBorder("Dados do livro"));
 
         titleField = new JTextField();
         authorField = new JTextField();
         isbnField = new JTextField();
         copiesField = new JTextField();
+
+        configureTextField(titleField);
+        configureTextField(authorField);
+        configureTextField(isbnField);
+        configureTextField(copiesField);
 
         panel.add(new JLabel("Título:"));
         panel.add(titleField);
@@ -71,9 +81,15 @@ public class BooksPanel extends JPanel {
         return panel;
     }
 
+    private void configureTextField(JTextField field) {
+        field.setColumns(25);
+        field.setPreferredSize(new Dimension(250, 28));
+    }
+
     // Cria os botões principais da aba.
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         JButton addButton = new JButton("Adicionar");
         JButton updateButton = new JButton("Editar");
@@ -105,18 +121,24 @@ public class BooksPanel extends JPanel {
         };
 
         booksTable = new JTable(tableModel);
+        booksTable.setRowHeight(24);
+        booksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         booksTable.getSelectionModel().addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting()) {
                 fillFieldsFromSelectedRow();
             }
         });
 
-        return new JScrollPane(booksTable);
+        JScrollPane scrollPane = new JScrollPane(booksTable);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Livros cadastrados"));
+
+        return scrollPane;
     }
 
     // Cria a área de busca por título, autor ou ISBN.
     private JPanel createSearchPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(BorderFactory.createTitledBorder("Busca"));
         JPanel buttonsPanel = new JPanel();
 
         searchField = new JTextField();

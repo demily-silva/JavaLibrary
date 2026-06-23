@@ -1,12 +1,15 @@
 package javalibrary.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,6 +35,7 @@ public class LoansPanel extends JPanel {
         this.library = library;
 
         setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         createComponents();
         refreshData();
     }
@@ -49,10 +53,14 @@ public class LoansPanel extends JPanel {
 
     // Cria os campos usados para informar o livro e o usuário.
     private JPanel createFormPanel() {
-        JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(2, 2, 8, 8));
+        panel.setBorder(BorderFactory.createTitledBorder("Dados do empréstimo"));
 
         isbnField = new JTextField();
         patronIdField = new JTextField();
+
+        configureTextField(isbnField);
+        configureTextField(patronIdField);
 
         panel.add(new JLabel("ISBN do livro:"));
         panel.add(isbnField);
@@ -62,9 +70,15 @@ public class LoansPanel extends JPanel {
         return panel;
     }
 
+    private void configureTextField(JTextField field) {
+        field.setColumns(25);
+        field.setPreferredSize(new Dimension(250, 28));
+    }
+
     // Cria os botões principais da aba.
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         JButton checkoutButton = new JButton("Emprestar");
         JButton returnButton = new JButton("Devolver");
@@ -96,13 +110,18 @@ public class LoansPanel extends JPanel {
         };
 
         loansTable = new JTable(tableModel);
+        loansTable.setRowHeight(24);
+        loansTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         loansTable.getSelectionModel().addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting()) {
                 fillFieldsFromSelectedRow();
             }
         });
 
-        return new JScrollPane(loansTable);
+        JScrollPane scrollPane = new JScrollPane(loansTable);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Empréstimos ativos"));
+
+        return scrollPane;
     }
 
     // Faz o empréstimo usando o ISBN do livro e o ID do usuário.

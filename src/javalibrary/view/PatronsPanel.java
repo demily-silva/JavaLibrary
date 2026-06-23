@@ -1,12 +1,15 @@
 package javalibrary.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,6 +36,7 @@ public class PatronsPanel extends JPanel {
         this.library = library;
 
         setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         createComponents();
         refreshTable(library.getPatrons());
     }
@@ -51,11 +55,16 @@ public class PatronsPanel extends JPanel {
 
     // Cria os campos usados para cadastrar ou editar um usuário.
     private JPanel createFormPanel() {
-        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+        JPanel panel = new JPanel(new GridLayout(3, 2, 8, 8));
+        panel.setBorder(BorderFactory.createTitledBorder("Dados do usuário"));
 
         idField = new JTextField();
         nameField = new JTextField();
         contactField = new JTextField();
+
+        configureTextField(idField);
+        configureTextField(nameField);
+        configureTextField(contactField);
 
         panel.add(new JLabel("ID:"));
         panel.add(idField);
@@ -67,9 +76,15 @@ public class PatronsPanel extends JPanel {
         return panel;
     }
 
+    private void configureTextField(JTextField field) {
+        field.setColumns(25);
+        field.setPreferredSize(new Dimension(250, 28));
+    }
+
     // Cria os botões principais da aba.
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
         JButton addButton = new JButton("Adicionar");
         JButton updateButton = new JButton("Editar");
@@ -101,18 +116,24 @@ public class PatronsPanel extends JPanel {
         };
 
         patronsTable = new JTable(tableModel);
+        patronsTable.setRowHeight(24);
+        patronsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         patronsTable.getSelectionModel().addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting()) {
                 fillFieldsFromSelectedRow();
             }
         });
 
-        return new JScrollPane(patronsTable);
+        JScrollPane scrollPane = new JScrollPane(patronsTable);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Usuários cadastrados"));
+
+        return scrollPane;
     }
 
     // Cria a área de busca por nome ou ID.
     private JPanel createSearchPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(BorderFactory.createTitledBorder("Busca"));
         JPanel buttonsPanel = new JPanel();
 
         searchField = new JTextField();
