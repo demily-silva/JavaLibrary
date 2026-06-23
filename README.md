@@ -62,6 +62,14 @@ data/loans.txt
 
 Esses arquivos são criados durante o uso do sistema.
 
+## Relatório
+
+O relatório final do projeto está disponível em `docs/relatorio-final.pdf`.
+
 ## Observação
 
 O sistema usa conceitos de Programação Orientada a Objetos, como classes, objetos, encapsulamento, associação entre classes, herança em exceções e tratamento de erros.
+
+## Autora
+
+Demily Estefany Rodrigues da Silva  
