@@ -20,7 +20,7 @@ public class Library {
         loans = new ArrayList<>();
     }
 
-    // --- Operações de livros ---
+    // --- Operações de livros CRUD---
 
     // Adiciona um novo livro à biblioteca
     public void addBook(Book book) {
@@ -116,7 +116,93 @@ public class Library {
         return new ArrayList<>(books);
     }
 
+    // --- Operações de usuários CRUD ---
+
+    // Adiciona um novo usuário à biblioteca.
+    public void addPatron(Patron patron) {
+        if (patron == null) {
+            throw new IllegalArgumentException("O usuário não pode ser vazio.");
+        }
+
+        // O ID é usado como identificação do usuário, então não pode repetir.
+        if (findPatronById(patron.getId()) != null) {
+            throw new IllegalArgumentException("Já existe um usuário com esse ID.");
+        }
+
+        patrons.add(patron);
+    }
+
+    // Busca um usuário pelo ID.
+    public Patron findPatronById(String id) {
+        if (id == null || id.isBlank()) {
+            return null;
+        }
+
+        for (Patron patron : patrons) {
+            if (patron.getId().equalsIgnoreCase(id)) {
+                return patron;
+            }
+        }
+
+        // Retorna null se não encontrar.
+        return null;
+    }
+
+    // Busca usuários pelo nome ou ID.
+    public List<Patron> searchPatrons(String text) {
+        ArrayList<Patron> results = new ArrayList<>();
+
+        if (text == null || text.isBlank()) {
+            // Se a busca estiver vazia, mostra todos os usuários cadastrados.
+            return getPatrons();
+        }
+
+        String searchText = text.toLowerCase();
+
+        for (Patron patron : patrons) {
+            boolean nameMatches = patron.getName().toLowerCase().contains(searchText);
+            boolean idMatches = patron.getId().toLowerCase().contains(searchText);
+
+            if (nameMatches || idMatches) {
+                results.add(patron);
+            }
+        }
+
+        return results;
+    }
+
+    // Atualiza os dados de um usuário existente.
+    public void updatePatron(String id, String newName, String newContact) {
+        Patron patron = findPatronById(id);
+
+        if (patron == null) {
+            throw new IllegalArgumentException("Usuário não encontrado.");
+        }
+
+        patron.setName(newName);
+        patron.setContact(newContact);
+    }
+
+    // Remove um usuário da biblioteca.
+    public void removePatron(String id) {
+        Patron patron = findPatronById(id);
+
+        if (patron == null) {
+            throw new IllegalArgumentException("Usuário não encontrado.");
+        }
+
+        // Um usuário com empréstimo ativo não deve ser removido do sistema.
+        for (Loan loan : loans) {
+            if (loan.isActive() && loan.getPatron().getId().equalsIgnoreCase(id)) {
+                throw new IllegalArgumentException("Não é possível remover um usuário com empréstimo ativo.");
+            }
+        }
+
+        patrons.remove(patron);
+    }
+
     public List<Patron> getPatrons() {
+        // Retorna uma cópia para proteger a lista original da biblioteca.
         return new ArrayList<>(patrons);
     }
 
