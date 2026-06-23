@@ -25,6 +25,29 @@ src/javalibrary/
 └── Main.java     Classe principal
 ```
 
+## Como executar
+
+O projeto foi feito em Java e não usa bibliotecas externas.
+
+Antes de executar, é necessário ter o JDK instalado.
+
+### Executando no Windows
+
+No PowerShell, dentro da pasta do projeto, use:
+
+```powershell
+javac -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
+java -cp out javalibrary.Main
+```
+
+### Executando no Linux
+
+No terminal, dentro da pasta do projeto, use:
+
+```bash
+mkdir -p out
+javac -d out $(find src -name "*.java")
+java -cp out javalibrary.Main
 ```
 
 ## Arquivos de dados
