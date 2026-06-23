@@ -31,7 +31,7 @@ public class MainFrame extends JFrame {
         JTabbedPane tabs = new JTabbedPane();
 
         tabs.addTab("Livros", new BooksPanel(library));
-        tabs.addTab("Usuários", createPlaceholderPanel("Cadastro e busca de usuários"));
+        tabs.addTab("Usuários", new PatronsPanel(library));
         tabs.addTab("Empréstimos", createPlaceholderPanel("Controle de empréstimos"));
 
         add(tabs, BorderLayout.CENTER);
