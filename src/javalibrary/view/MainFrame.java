@@ -3,10 +3,7 @@ package javalibrary.view;
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
 
 import javalibrary.service.Library;
 
@@ -14,6 +11,9 @@ import javalibrary.service.Library;
 public class MainFrame extends JFrame {
 
     private Library library;
+    private BooksPanel booksPanel;
+    private PatronsPanel patronsPanel;
+    private LoansPanel loansPanel;
 
     public MainFrame(Library library) {
         this.library = library;
@@ -30,24 +30,33 @@ public class MainFrame extends JFrame {
     private void createComponents() {
         JTabbedPane tabs = new JTabbedPane();
 
-        tabs.addTab("Livros", new BooksPanel(library));
-        tabs.addTab("Usuários", new PatronsPanel(library));
-        tabs.addTab("Empréstimos", createPlaceholderPanel("Controle de empréstimos"));
+        booksPanel = new BooksPanel(library);
+        patronsPanel = new PatronsPanel(library);
+        loansPanel = new LoansPanel(library);
+
+        tabs.addTab("Livros", booksPanel);
+        tabs.addTab("Usuários", patronsPanel);
+        tabs.addTab("Empréstimos", loansPanel);
+
+        tabs.addChangeListener(event -> refreshSelectedTab(tabs));
 
         add(tabs, BorderLayout.CENTER);
     }
 
-    // Painel temporário
-    private JPanel createPlaceholderPanel(String text) {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel label = new JLabel(text, SwingConstants.CENTER);
-
-        panel.add(label, BorderLayout.CENTER);
-
-        return panel;
-    }
-
     public Library getLibrary() {
         return library;
+    }
+
+    // Atualiza a aba selecionada para mostrar os dados mais recentes.
+    private void refreshSelectedTab(JTabbedPane tabs) {
+        int selectedIndex = tabs.getSelectedIndex();
+
+        if (selectedIndex == 0) {
+            booksPanel.refreshData();
+        } else if (selectedIndex == 1) {
+            patronsPanel.refreshData();
+        } else if (selectedIndex == 2) {
+            loansPanel.refreshData();
+        }
     }
 }

@@ -210,6 +210,11 @@ public class PatronsPanel extends JPanel {
         }
     }
 
+    // Atualiza a tabela com os dados atuais da biblioteca.
+    public void refreshData() {
+        refreshTable(library.getPatrons());
+    }
+
     // Preenche os campos quando o usuário seleciona uma linha da tabela.
     private void fillFieldsFromSelectedRow() {
         int row = patronsTable.getSelectedRow();
