@@ -13,6 +13,7 @@ import java.util.List;
 import javalibrary.model.Book;
 import javalibrary.model.Loan;
 import javalibrary.model.Patron;
+import javalibrary.service.Library;
 
 // Classe responsável por salvar e carregar os dados do sistema em arquivos.
 public class FileManager {
@@ -21,6 +22,24 @@ public class FileManager {
     private static final String PATRONS_FILE = "data/patrons.txt";
     private static final String LOANS_FILE = "data/loans.txt";
     private static final String SEPARATOR = ";";
+
+    // Salva todos os dados da biblioteca.
+    public static void saveLibrary(Library library) throws IOException {
+        saveBooks(library.getBooks());
+        savePatrons(library.getPatrons());
+        saveLoans(library.getLoans());
+    }
+
+    // Carrega todos os dados da biblioteca.
+    public static Library loadLibrary() throws IOException {
+        List<Book> books = loadBooks();
+        List<Patron> patrons = loadPatrons();
+
+        // Os empréstimos precisam dos livros e usuários já carregados.
+        List<Loan> loans = loadLoans(books, patrons);
+
+        return new Library(books, patrons, loans);
+    }
 
     // Salva a lista de livros no arquivo de texto.
     public static void saveBooks(List<Book> books) throws IOException {

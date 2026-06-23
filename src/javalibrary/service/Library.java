@@ -23,6 +23,23 @@ public class Library {
         loans = new ArrayList<>();
     }
 
+    // Este construtor será usado quando os dados forem carregados dos arquivos.
+    public Library(List<Book> books, List<Patron> patrons, List<Loan> loans) {
+        this();
+
+        if (books != null) {
+            this.books.addAll(books);
+        }
+
+        if (patrons != null) {
+            this.patrons.addAll(patrons);
+        }
+
+        if (loans != null) {
+            this.loans.addAll(loans);
+        }
+    }
+
     // --- Operações de livros CRUD---
 
     // Adiciona um novo livro à biblioteca
